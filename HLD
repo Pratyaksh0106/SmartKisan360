@@ -1,0 +1,97 @@
+// Using AWS Bedrock instead of direct Anthropic API
+const { BedrockRuntimeClient, InvokeModelCommand } = require("@aws-sdk/client-bedrock-runtime");
+
+const client = new BedrockRuntimeClient({ region: "ap-south-1" });
+
+async function callLLM(systemPrompt, userMessage) {
+  const command = new InvokeModelCommand({
+    modelId: "anthropic.claude-3-sonnet-20240229-v1:0",
+    contentType: "application/json",
+    body: JSON.stringify({
+      anthropic_version: "bedrock-2023-05-31",
+      max_tokens: 1024,
+      system: systemPrompt,
+      messages: [{ role: "user", content: userMessage }]
+    })
+  });
+  
+  const response = await client.send(command);
+  return JSON.parse(new TextDecoder().decode(response.body));
+}
+```
+
+**Database → Amazon RDS (PostgreSQL) + Amazon ElastiCache (Redis)**
+
+RDS free tier gives you a db.t3.micro PostgreSQL instance. ElastiCache for Redis handles your LLM response caching and rate limiting.
+
+**File/Image Storage → Amazon S3**
+
+If farmers upload crop photos for disease detection or produce images for marketplace listings, store them in S3.
+
+**Weather & External Data Fetching → AWS Lambda + EventBridge**
+
+Scheduled Lambda functions triggered by EventBridge rules to periodically pull weather data and mandi prices. Store the results in RDS so your main API has fresh data without hitting external APIs on every request.
+
+**Notifications & Alerts → Amazon SNS**
+
+Risk alerts (heatwave, drought, pest outbreak) pushed to farmers via SMS through SNS. This is perfect for low-bandwidth rural users who may not have the app open. SNS supports SMS delivery in India.
+
+**Secrets & Config → AWS Secrets Manager / SSM Parameter Store**
+
+Store your API keys, database credentials, and Bedrock config in SSM Parameter Store (free) or Secrets Manager.
+
+**Logging & Monitoring → Amazon CloudWatch**
+
+All Lambda and API Gateway logs flow to CloudWatch automatically. Set up alarms for error rates and latency.
+
+**CI/CD (bonus points) → AWS CodePipeline + CodeBuild**
+
+If you have time, set up a simple pipeline that deploys from GitHub to your EC2/Lambda.
+
+---
+
+**Updated Architecture Diagram**
+```
+Farmer/Advisor/Buyer (React PWA)
+        │
+        ▼
+   AWS Cognito (Auth - Phone+OTP, JWT, User Groups)
+        │
+        ▼
+   API Gateway (REST API, throttling, CORS)
+        │
+        ▼
+   Node.js on EC2  ──or──  Lambda Functions
+        │
+        ├──→ Amazon Bedrock (Claude/Titan)
+        │         • Crop Recommender prompt
+        │         • Irrigation Planner prompt
+        │         • Yield Predictor prompt
+        │         • Price Forecaster prompt
+        │         • Risk Analyzer prompt
+        │
+        ├──→ RDS PostgreSQL (users, farms, crops, history)
+        │
+        ├──→ ElastiCache Redis (LLM response cache)
+        │
+        ├──→ S3 (crop images, produce photos)
+        │
+        └──→ SNS (SMS risk alerts to farmers)
+
+   EventBridge + Lambda (scheduled)
+        │
+        ├──→ Weather API → store in RDS
+        └──→ Agmarknet API → store in RDS
+```
+
+---
+
+**Phase 2 Addition**
+
+When you move to fine-tuning, you add:
+```
+Amazon SageMaker
+    ├── Training jobs (fine-tune on collected data)
+    ├── Model hosting (inference endpoints)
+    └── Your Node.js just calls SageMaker endpoint 
+        instead of Bedrock
