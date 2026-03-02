@@ -6,6 +6,72 @@ const MODEL_ID = process.env.BEDROCK_MODEL_ID || "anthropic.claude-3-haiku-20240
  * Invoke AWS Bedrock (Claude) using Bedrock API Key as Bearer token.
  * Shared utility used by all AI-powered features.
  */
+/**
+ * Invoke AWS Bedrock (Claude) with image + text input for multimodal analysis.
+ * Used for features like soil image analysis.
+ */
+export const invokeBedrockWithImage = async (systemPrompt, userMessage, imageBase64, mediaType = "image/jpeg") => {
+    const payload = {
+        anthropic_version: "bedrock-2023-05-31",
+        max_tokens: 4096,
+        temperature: 0.3,
+        system: systemPrompt,
+        messages: [
+            {
+                role: "user",
+                content: [
+                    {
+                        type: "image",
+                        source: {
+                            type: "base64",
+                            media_type: mediaType,
+                            data: imageBase64,
+                        },
+                    },
+                    {
+                        type: "text",
+                        text: userMessage,
+                    },
+                ],
+            },
+        ],
+    };
+
+    const url = `https://bedrock-runtime.${BEDROCK_REGION}.amazonaws.com/model/${encodeURIComponent(MODEL_ID)}/invoke`;
+
+    const response = await fetch(url, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+            Authorization: `Bearer ${BEDROCK_API_KEY}`,
+        },
+        body: JSON.stringify(payload),
+    });
+
+    if (!response.ok) {
+        const errorText = await response.text();
+        console.error("Bedrock API error:", response.status, errorText);
+        throw new Error(`Bedrock API error (${response.status}): ${errorText}`);
+    }
+
+    const responseBody = await response.json();
+
+    if (responseBody.content && responseBody.content[0]) {
+        return responseBody.content[0].text;
+    }
+
+    if (responseBody.completion) {
+        return responseBody.completion;
+    }
+
+    throw new Error("Unexpected response format from Bedrock API");
+};
+
+/**
+ * Invoke AWS Bedrock (Claude) using Bedrock API Key as Bearer token.
+ * Shared utility used by all AI-powered features.
+ */
 export const invokeBedrock = async (systemPrompt, userMessage) => {
     const payload = {
         anthropic_version: "bedrock-2023-05-31",

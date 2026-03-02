@@ -6,13 +6,14 @@ import irrigationRouter from "./services/irrigation-planner/irrigation.route.js"
 import yieldRouter from "./services/yield-predictor/yield.route.js";
 import priceRouter from "./services/price-forecaster/price.route.js";
 import riskRouter from "./services/risk-analyzer/risk.route.js";
+import soilRouter from "./services/soil-analyzer/soil.route.js";
 
 const server = express();
 const PORT = process.env.PORT || 3000;
 
 // ─── Middleware ──────────────────────────────────────────────────────────────
 server.json = express.json;
-server.use(express.json());
+server.use(express.json({ limit: '10mb' }));
 server.use(express.urlencoded({ extended: true }));
 
 // ─── Health Check ────────────────────────────────────────────────────────────
@@ -31,6 +32,7 @@ server.use("/irrigation", irrigationRouter);
 server.use("/yield", yieldRouter);
 server.use("/price", priceRouter);
 server.use("/risk", riskRouter);
+server.use("/soil", soilRouter);
 
 // ─── 404 Handler ─────────────────────────────────────────────────────────────
 server.use((req, res) => {
