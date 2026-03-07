@@ -7,6 +7,9 @@
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
     "scheme": "smartkisaan",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
@@ -14,16 +17,28 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.smartkisaan.app"
+      "bundleIdentifier": "com.smartkisaan.app",
+      "infoPlist": {
+        "NSLocationWhenInUseUsageDescription": "Smart Kisaan needs your location to provide crop recommendations based on your area.",
+        "NSCameraUsageDescription": "Smart Kisaan needs camera access to scan your soil for AI analysis.",
+        "NSPhotoLibraryUsageDescription": "Smart Kisaan needs photo library access to select soil images for analysis."
+      }
     },
     "android": {
       "package": "com.smartkisaan.app",
+      "versionCode": 1,
       "adaptiveIcon": {
         "backgroundColor": "#0f172a",
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
+      "permissions": [
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION",
+        "CAMERA",
+        "READ_EXTERNAL_STORAGE"
+      ],
       "predictiveBackGestureEnabled": false
     },
     "web": {
@@ -33,7 +48,28 @@
     "plugins": [
       "expo-router",
       "expo-asset",
-      "expo-font"
-    ]
+      "expo-font",
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "Smart Kisaan needs your location to provide crop recommendations based on your area."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Smart Kisaan needs photo library access to select soil images for analysis.",
+          "cameraPermission": "Smart Kisaan needs camera access to scan your soil for AI analysis."
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": ""
+      },
+      "router": {
+        "origin": false
+      }
+    }
   }
 }

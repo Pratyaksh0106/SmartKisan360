@@ -1,0 +1,278 @@
+.location-picker {
+    margin-bottom: 0.5rem;
+}
+
+/* ─── Detect Location Button ──────────────────────────────────────────────── */
+.location-detect-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 0.7rem 1rem;
+    background: rgba(59, 130, 246, 0.08);
+    border: 1px solid rgba(59, 130, 246, 0.25);
+    border-radius: 0.75rem;
+    color: #60a5fa;
+    font-size: 0.9rem;
+    font-weight: 600;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    margin-bottom: 0.75rem;
+}
+
+.location-detect-btn:hover:not(:disabled) {
+    background: rgba(59, 130, 246, 0.15);
+    border-color: rgba(59, 130, 246, 0.4);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.15);
+}
+
+.location-detect-btn:disabled {
+    opacity: 0.7;
+    cursor: wait;
+}
+
+.location-detect-btn .spinner-inline {
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(96, 165, 250, 0.3);
+    border-top-color: #60a5fa;
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+}
+
+/* ─── Divider ──────────────────────────────────────────────────────────────── */
+.location-divider {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.75rem;
+}
+
+.location-divider-line {
+    flex: 1;
+    height: 1px;
+    background: rgba(51, 65, 85, 0.4);
+}
+
+.location-divider-text {
+    color: #64748b;
+    font-size: 0.75rem;
+    white-space: nowrap;
+}
+
+/* ─── Dropdown Wrapper ─────────────────────────────────────────────────────── */
+.location-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.location-dropdown-wrapper {
+    position: relative;
+}
+
+.location-dropdown-label {
+    display: block;
+    color: #cbd5e1;
+    font-size: 0.8rem;
+    font-weight: 500;
+    margin-bottom: 0.35rem;
+}
+
+/* ─── Select Button (trigger) ──────────────────────────────────────────────── */
+.location-select-btn {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: 0.6rem 0.85rem;
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(51, 65, 85, 0.6);
+    border-radius: 0.5rem;
+    color: #e2e8f0;
+    font-size: 0.85rem;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    text-align: left;
+}
+
+.location-select-btn:hover {
+    border-color: rgba(51, 65, 85, 0.9);
+}
+
+.location-select-btn.open {
+    border-color: #22c55e;
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
+}
+
+.location-select-btn.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.location-select-btn .placeholder {
+    color: #64748b;
+}
+
+.location-select-btn .arrow {
+    color: #64748b;
+    font-size: 0.6rem;
+    margin-left: 0.5rem;
+    transition: transform 0.2s;
+}
+
+.location-select-btn.open .arrow {
+    transform: rotate(180deg);
+}
+
+/* ─── Dropdown Panel ───────────────────────────────────────────────────────── */
+.location-dropdown-panel {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: #1e293b;
+    border: 1px solid rgba(51, 65, 85, 0.7);
+    border-radius: 0.75rem;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5);
+    padding: 0.5rem;
+    max-height: 300px;
+    display: flex;
+    flex-direction: column;
+    animation: dropdownSlideIn 0.2s ease;
+}
+
+@keyframes dropdownSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* ─── Search Input ──────────────────────────────────────────────────────────── */
+.location-search {
+    width: 100%;
+    padding: 0.55rem 0.75rem;
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(51, 65, 85, 0.5);
+    border-radius: 0.5rem;
+    color: #e2e8f0;
+    font-size: 0.82rem;
+    font-family: 'Inter', sans-serif;
+    margin-bottom: 0.35rem;
+    box-sizing: border-box;
+}
+
+.location-search:focus {
+    outline: none;
+    border-color: #22c55e;
+    box-shadow: 0 0 0 2px rgba(34, 197, 94, 0.1);
+}
+
+.location-search::placeholder {
+    color: #64748b;
+}
+
+/* ─── Options List ──────────────────────────────────────────────────────────── */
+.location-options {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    overflow-y: auto;
+    flex: 1;
+}
+
+.location-options::-webkit-scrollbar {
+    width: 4px;
+}
+
+.location-options::-webkit-scrollbar-thumb {
+    background: #475569;
+    border-radius: 2px;
+}
+
+.location-option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.5rem 0.75rem;
+    border-radius: 0.4rem;
+    cursor: pointer;
+    color: #cbd5e1;
+    font-size: 0.85rem;
+    transition: background-color 0.15s;
+}
+
+.location-option:hover {
+    background: rgba(34, 197, 94, 0.08);
+}
+
+.location-option.active {
+    background: rgba(34, 197, 94, 0.12);
+    color: #22c55e;
+    font-weight: 600;
+}
+
+.location-option .checkmark {
+    color: #22c55e;
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+.location-empty {
+    color: #64748b;
+    font-size: 0.82rem;
+    text-align: center;
+    padding: 1.5rem 0;
+}
+
+/* ─── Custom Entry ──────────────────────────────────────────────────────────── */
+.location-custom-entry {
+    border-top: 1px solid rgba(51, 65, 85, 0.4);
+    margin-top: 0.25rem;
+    padding-top: 0.4rem;
+}
+
+.location-custom-entry button {
+    width: 100%;
+    padding: 0.45rem;
+    background: none;
+    border: none;
+    color: #60a5fa;
+    font-size: 0.8rem;
+    font-family: 'Inter', sans-serif;
+    cursor: pointer;
+    border-radius: 0.4rem;
+    transition: background 0.15s;
+}
+
+.location-custom-entry button:hover {
+    background: rgba(59, 130, 246, 0.1);
+}
+
+/* ─── Dropdown Overlay (click-away) ────────────────────────────────────────── */
+.location-dropdown-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 99;
+}
+
+/* ─── Responsive ───────────────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+    .location-row {
+        grid-template-columns: 1fr;
+    }
+}

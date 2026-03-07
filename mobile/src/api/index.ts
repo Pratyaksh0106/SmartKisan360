@@ -4,7 +4,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 // For local development with Android Emulator, use 10.0.2.2 instead of localhost
 // For local development with iOS Simulator, use localhost
 // For physical device, use your computer's local IP (e.g. 192.168.1.100)
-const API_BASE = 'http://192.168.1.8:3000'; // Android Emulator → host machine localhost:3000
+const API_BASE = 'http://172.20.10.2:3000'; // Android Emulator → host machine localhost:3000
 
 async function request(endpoint: string, options: RequestInit = {}) {
     const token = await AsyncStorage.getItem('accessToken');

@@ -1,16 +1,30 @@
 import { useState } from 'react';
 import { cropApi } from '../../api';
 import FeatureForm, { FormSection, FormField, FormRow } from '../../components/FeatureForm';
+import LocationPicker from '../../components/LocationPicker';
+import SoilImagePicker from '../../components/SoilImagePicker';
+import { getCurrentSeason, getSeasonLabel } from '../../utils/season';
 
 export default function CropRecommender() {
     const [result, setResult] = useState<any>(null);
     const [form, setForm] = useState({
         city: '', state: '', lat: '', lon: '',
         soilType: '', ph: '', nitrogen: '', phosphorus: '', potassium: '',
-        season: '', landArea: '', waterAvailability: '', irrigationType: '',
+        season: getCurrentSeason(), landArea: '', waterAvailability: '', irrigationType: '',
     });
 
-    const update = (key: string, val: string) => setForm({ ...form, [key]: val });
+    const update = (key: string, val: string) => setForm(prev => ({ ...prev, [key]: val }));
+
+    const handleSoilData = (data: any) => {
+        setForm(prev => ({
+            ...prev,
+            soilType: data.soilType || prev.soilType,
+            ph: data.ph ? String(data.ph) : prev.ph,
+            nitrogen: data.nitrogen ? String(data.nitrogen) : prev.nitrogen,
+            phosphorus: data.phosphorus ? String(data.phosphorus) : prev.phosphorus,
+            potassium: data.potassium ? String(data.potassium) : prev.potassium,
+        }));
+    };
 
     const handleSubmit = async () => {
         const res = await cropApi.recommend({
@@ -49,13 +63,26 @@ export default function CropRecommender() {
             )}
         >
             <FormSection title="📍 Location">
-                <FormRow>
-                    <FormField label="City / Village"><input value={form.city} onChange={e => update('city', e.target.value)} placeholder="e.g. Lucknow" /></FormField>
-                    <FormField label="State"><input value={form.state} onChange={e => update('state', e.target.value)} placeholder="e.g. Uttar Pradesh" required /></FormField>
-                </FormRow>
+                <LocationPicker
+                    state={form.state}
+                    city={form.city}
+                    onStateChange={(v) => update('state', v)}
+                    onCityChange={(v) => update('city', v)}
+                />
             </FormSection>
 
             <FormSection title="🧪 Soil Data">
+                <SoilImagePicker
+                    onSoilDataDetected={handleSoilData}
+                    location={{ city: form.city, state: form.state }}
+                />
+
+                <div className="soil-divider">
+                    <div className="soil-divider-line" />
+                    <span className="soil-divider-text">or enter manually</span>
+                    <div className="soil-divider-line" />
+                </div>
+
                 <FormRow>
                     <FormField label="Soil Type *"><input value={form.soilType} onChange={e => update('soilType', e.target.value)} placeholder="e.g. Alluvial, Black, Red" required /></FormField>
                     <FormField label="Soil pH"><input type="number" step="0.1" value={form.ph} onChange={e => update('ph', e.target.value)} placeholder="e.g. 6.8" /></FormField>
@@ -68,7 +95,7 @@ export default function CropRecommender() {
 
             <FormSection title="🌦️ Season & Water">
                 <FormRow>
-                    <FormField label="Season">
+                    <FormField label={`Season (auto: ${getSeasonLabel()})`}>
                         <select value={form.season} onChange={e => update('season', e.target.value)}>
                             <option value="">Select season</option>
                             <option>Kharif</option><option>Rabi</option><option>Zaid</option>

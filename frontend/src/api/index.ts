@@ -82,3 +82,8 @@ export const riskApi = {
     analyze: (body: any) =>
         request('/risk/analyze', { method: 'POST', body: JSON.stringify(body) }),
 };
+
+export const soilApi = {
+    analyzeImage: (body: { image: string; mediaType?: string; location?: { city?: string; state?: string } }) =>
+        request('/soil/analyze-image', { method: 'POST', body: JSON.stringify(body) }),
+};

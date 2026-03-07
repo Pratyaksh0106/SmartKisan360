@@ -1,16 +1,18 @@
 import { useState } from 'react';
 import { priceApi } from '../../api';
 import FeatureForm, { FormSection, FormField, FormRow } from '../../components/FeatureForm';
+import LocationPicker from '../../components/LocationPicker';
+import { getCurrentSeason, getSeasonLabel } from '../../utils/season';
 
 export default function PriceForecaster() {
     const [result, setResult] = useState<any>(null);
     const [form, setForm] = useState({
         cropName: '', variety: '', quality: '',
         city: '', state: '',
-        season: '', quantity: '', harvestDate: '', storageAvailable: '',
+        season: getCurrentSeason(), quantity: '', harvestDate: '', storageAvailable: '',
     });
 
-    const update = (key: string, val: string) => setForm({ ...form, [key]: val });
+    const update = (key: string, val: string) => setForm(prev => ({ ...prev, [key]: val }));
 
     const handleSubmit = async () => {
         const res = await priceApi.forecast({
@@ -54,10 +56,12 @@ export default function PriceForecaster() {
                 </FormRow>
             </FormSection>
             <FormSection title="📍 Location">
-                <FormRow>
-                    <FormField label="City *"><input value={form.city} onChange={e => update('city', e.target.value)} required /></FormField>
-                    <FormField label="State *"><input value={form.state} onChange={e => update('state', e.target.value)} required /></FormField>
-                </FormRow>
+                <LocationPicker
+                    state={form.state}
+                    city={form.city}
+                    onStateChange={(v) => update('state', v)}
+                    onCityChange={(v) => update('city', v)}
+                />
             </FormSection>
             <FormSection title="📅 Timeline">
                 <FormRow>

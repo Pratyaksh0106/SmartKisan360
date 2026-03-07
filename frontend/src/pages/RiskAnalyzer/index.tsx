@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { riskApi } from '../../api';
 import FeatureForm, { FormSection, FormField, FormRow } from '../../components/FeatureForm';
+import LocationPicker from '../../components/LocationPicker';
+import { getCurrentSeason, getSeasonLabel } from '../../utils/season';
 
 export default function RiskAnalyzer() {
     const [result, setResult] = useState<any>(null);
@@ -8,12 +10,12 @@ export default function RiskAnalyzer() {
         cropName: '', growthStage: '', investmentSoFar: '',
         city: '', state: '',
         soilType: '', ph: '',
-        season: '', landArea: '',
+        season: getCurrentSeason(), landArea: '',
         irrigationType: '', insurance: '',
         concerns: '',
     });
 
-    const update = (key: string, val: string) => setForm({ ...form, [key]: val });
+    const update = (key: string, val: string) => setForm(prev => ({ ...prev, [key]: val }));
 
     const handleSubmit = async () => {
         const res = await riskApi.analyze({
@@ -61,15 +63,22 @@ export default function RiskAnalyzer() {
                 <FormField label="Investment So Far (₹)"><input value={form.investmentSoFar} onChange={e => update('investmentSoFar', e.target.value)} placeholder="e.g. 45000" /></FormField>
             </FormSection>
             <FormSection title="📍 Location">
-                <FormRow>
-                    <FormField label="City *"><input value={form.city} onChange={e => update('city', e.target.value)} required /></FormField>
-                    <FormField label="State *"><input value={form.state} onChange={e => update('state', e.target.value)} required /></FormField>
-                </FormRow>
+                <LocationPicker
+                    state={form.state}
+                    city={form.city}
+                    onStateChange={(v) => update('state', v)}
+                    onCityChange={(v) => update('city', v)}
+                />
             </FormSection>
             <FormSection title="🧪 Soil & Season">
                 <FormRow>
                     <FormField label="Soil Type *"><input value={form.soilType} onChange={e => update('soilType', e.target.value)} required /></FormField>
-                    <FormField label="Season"><select value={form.season} onChange={e => update('season', e.target.value)}><option value="">Select</option><option>Kharif</option><option>Rabi</option><option>Zaid</option></select></FormField>
+                    <FormField label={`Season (auto: ${getSeasonLabel()})`}>
+                        <select value={form.season} onChange={e => update('season', e.target.value)}>
+                            <option value="">Select</option>
+                            <option>Kharif</option><option>Rabi</option><option>Zaid</option>
+                        </select>
+                    </FormField>
                 </FormRow>
             </FormSection>
             <FormSection title="🔍 Concerns">

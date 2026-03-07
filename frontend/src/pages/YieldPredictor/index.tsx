@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { yieldApi } from '../../api';
 import FeatureForm, { FormSection, FormField, FormRow } from '../../components/FeatureForm';
+import LocationPicker from '../../components/LocationPicker';
+import { getCurrentSeason, getSeasonLabel } from '../../utils/season';
 
 export default function YieldPredictor() {
     const [result, setResult] = useState<any>(null);
@@ -8,10 +10,10 @@ export default function YieldPredictor() {
         cropName: '', variety: '', sowingDate: '',
         city: '', state: '',
         soilType: '', ph: '', nitrogen: '', phosphorus: '', potassium: '',
-        season: '', landArea: '', irrigationType: '', previousCrop: '',
+        season: getCurrentSeason(), landArea: '', irrigationType: '', previousCrop: '',
     });
 
-    const update = (key: string, val: string) => setForm({ ...form, [key]: val });
+    const update = (key: string, val: string) => setForm(prev => ({ ...prev, [key]: val }));
 
     const handleSubmit = async () => {
         const res = await yieldApi.predict({
@@ -51,15 +53,22 @@ export default function YieldPredictor() {
                 </FormRow>
             </FormSection>
             <FormSection title="📍 Location">
-                <FormRow>
-                    <FormField label="City *"><input value={form.city} onChange={e => update('city', e.target.value)} required /></FormField>
-                    <FormField label="State *"><input value={form.state} onChange={e => update('state', e.target.value)} required /></FormField>
-                </FormRow>
+                <LocationPicker
+                    state={form.state}
+                    city={form.city}
+                    onStateChange={(v) => update('state', v)}
+                    onCityChange={(v) => update('city', v)}
+                />
             </FormSection>
             <FormSection title="🧪 Soil">
                 <FormRow>
                     <FormField label="Soil Type *"><input value={form.soilType} onChange={e => update('soilType', e.target.value)} required /></FormField>
-                    <FormField label="Season"><select value={form.season} onChange={e => update('season', e.target.value)}><option value="">Select</option><option>Kharif</option><option>Rabi</option><option>Zaid</option></select></FormField>
+                    <FormField label={`Season (auto: ${getSeasonLabel()})`}>
+                        <select value={form.season} onChange={e => update('season', e.target.value)}>
+                            <option value="">Select</option>
+                            <option>Kharif</option><option>Rabi</option><option>Zaid</option>
+                        </select>
+                    </FormField>
                 </FormRow>
             </FormSection>
         </FeatureForm>
